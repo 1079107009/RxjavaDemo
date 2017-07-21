@@ -15,10 +15,12 @@ import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,7 +33,47 @@ public class MainActivity extends AppCompatActivity {
 //        changeThread();  //线程切换
 //        map();              //map操作符
 //        flatMap();         //flatmap操作符无序，concatMap有序
-        zip();
+//        zip();
+        testPublishSubject();
+    }
+
+    private void testPublishSubject() {
+        final PublishSubject<Boolean> publishSubject = PublishSubject.create();
+        publishSubject.subscribe(new Observer<Boolean>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(Boolean value) {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+                System.out.println("Observable Completed");
+            }
+        });
+
+        Observable.create(new ObservableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(ObservableEmitter<Integer> e) throws Exception {
+                for (int i = 0; i < 5; i++) {
+                    e.onNext(i);
+                }
+            }
+        }).doOnComplete(new Action() {
+            @Override
+            public void run() throws Exception {
+                publishSubject.onNext(true);
+            }
+        }).subscribe();
     }
 
     private void map() {
